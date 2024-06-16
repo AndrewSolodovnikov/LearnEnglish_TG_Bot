@@ -1,5 +1,12 @@
-hello | привет | 2
-dog | собака | 1
-cat | кошка | 1
-home | дом | 0
-run | бег |
+hello | привет | 0
+dog | собака | 0
+cat | кошка | 0
+home | дом | 4
+run | бег | 4
+love | любовь | 0
+learn | учить | 0
+computer | компьютер | 0
+change | замена | 0
+return | вернуть | 0
+shuffled | перетасованный | 0
+take | брать | 0
