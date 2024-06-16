@@ -52,6 +52,7 @@ data class Word(
     val translate: String,
     val correctAnswerCount: Int = 0,
 )
+
 fun learningWords(dictionary: List<Word>) {
     var wordsForQuestion: List<Word>
 
@@ -63,17 +64,20 @@ fun learningWords(dictionary: List<Word>) {
             wordsForQuestion = dictionary.shuffled().take(NUMBER_OF_QUESTION)
         }
 
-        val studyWord = wordsForQuestion[Random.nextInt(0, NUMBER_OF_QUESTION)]
+        val studyWord = wordsForQuestion.random()
 
         println("Переведи слово: ${studyWord.text}")
-        println(
-            "Варианты: " +
-                    "1 - ${wordsForQuestion[0].translate.trim()}, " +
-                    "2 - ${wordsForQuestion[1].translate.trim()}, " +
-                    "3 - ${wordsForQuestion[2].translate.trim()}, " +
-                    "4 - ${wordsForQuestion[3].translate.trim()}"
-        )
+        val question = wordsForQuestion.mapIndexed { index, word ->
+            "${index + 1} - ${word.translate.trim()}"
+        }
+        println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
+
         val answer = readln()
+
+        if (answer == "0") {
+            println("Главное меню")
+            return
+        }
     }
     println("Вы выучили все слова!")
 }
