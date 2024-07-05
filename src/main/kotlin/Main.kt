@@ -1,20 +1,9 @@
 import java.io.File
-import kotlin.random.Random
 
 const val TARGET_NUMBER_OF_WORDS_LEARNED = 3
 const val NUMBER_OF_QUESTION = 4
 fun main() {
-    val wordsFile: File = File("words.txt")
-    wordsFile.createNewFile()
-
-    val dictionary = mutableListOf<Word>()
-
-    val lines = wordsFile.readLines()
-    lines.forEach {
-        val line = it.split("|")
-        val correctAnswerCount = line[2].trim().toIntOrNull() ?: 0
-        dictionary.add(Word(line[0], line[1], correctAnswerCount))
-    }
+    val dictionary: List<Word> = loadDictionary()
 
     while (true) {
         println("Меню: 1 – Учить слова, 2 – Статистика, 0 – Выход")
@@ -32,17 +21,27 @@ fun main() {
     }
 }
 
-fun countLearnedWords(dictionary: List<Word>): Int {
-    return dictionary.filter { it.correctAnswerCount >= TARGET_NUMBER_OF_WORDS_LEARNED }.size
+private fun loadDictionary() = File("words.txt")
+    .readLines()
+    .mapNotNull {
+        val split = it.split("|")
+        if (split.size == 3) {
+            val correctAnswerCount = split[2].trim().toIntOrNull() ?: 0
+            Word(split[0], split[1], correctAnswerCount)
+        } else null
+    }
+
+fun getLearnedWords(dictionary: List<Word>): List<Word> {
+    return dictionary.filter { it.correctAnswerCount >= TARGET_NUMBER_OF_WORDS_LEARNED }
 }
 
-fun countUnlearnedWords(dictionary: List<Word>): Int {
-    return dictionary.size - countLearnedWords(dictionary)
+fun getUnlearnedWords(dictionary: List<Word>): List<Word> {
+    return dictionary.filter { it.correctAnswerCount <= TARGET_NUMBER_OF_WORDS_LEARNED }
 }
 
 fun statistics(dictionary: List<Word>) {
     val countWords = dictionary.size
-    val countLearnedWords = countLearnedWords(dictionary)
+    val countLearnedWords = getLearnedWords(dictionary).size
     val percentageWordsLearned = countLearnedWords * 100 / countWords
     println("Выучено $countLearnedWords из $countWords | $percentageWordsLearned%")
 }
@@ -52,28 +51,35 @@ data class Word(
     val translate: String,
     val correctAnswerCount: Int = 0,
 )
-fun learningWords(dictionary: List<Word>) {
-    var wordsForQuestion: List<Word>
 
-    while (countUnlearnedWords(dictionary) > 0) {
-        if (countUnlearnedWords(dictionary) >= NUMBER_OF_QUESTION) {
-            wordsForQuestion = dictionary.filter { it.correctAnswerCount <= TARGET_NUMBER_OF_WORDS_LEARNED }
-                .shuffled().take(NUMBER_OF_QUESTION)
-        } else {
-            wordsForQuestion = dictionary.shuffled().take(NUMBER_OF_QUESTION)
+fun learningWords(dictionary: List<Word>) {
+    while (true) {
+        val unlearnedWords = getUnlearnedWords(dictionary)
+        if (unlearnedWords.isEmpty()) {
+            println("Вы выучили все слова!")
+            break
         }
 
-        val studyWord = wordsForQuestion[Random.nextInt(0, NUMBER_OF_QUESTION)]
+        var wordsForQuestion = unlearnedWords.shuffled().take(NUMBER_OF_QUESTION)
+        if (wordsForQuestion.size < NUMBER_OF_QUESTION) {
+            wordsForQuestion = wordsForQuestion + getLearnedWords(dictionary)
+                .shuffled()
+                .take(NUMBER_OF_QUESTION - wordsForQuestion.size)
+        }
+
+        val studyWord = wordsForQuestion.random()
 
         println("Переведи слово: ${studyWord.text}")
-        println(
-            "Варианты: " +
-                    "1 - ${wordsForQuestion[0].translate.trim()}, " +
-                    "2 - ${wordsForQuestion[1].translate.trim()}, " +
-                    "3 - ${wordsForQuestion[2].translate.trim()}, " +
-                    "4 - ${wordsForQuestion[3].translate.trim()}"
-        )
+        val question = wordsForQuestion.mapIndexed { index, word ->
+            "${index + 1} - ${word.translate.trim()}"
+        }
+        println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
+
         val answer = readln()
+
+        if (answer == "0") {
+            println("Главное меню")
+            return
+        }
     }
-    println("Вы выучили все слова!")
 }
