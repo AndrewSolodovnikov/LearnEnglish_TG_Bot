@@ -62,11 +62,9 @@ fun learningWords(dictionary: List<Word>) {
 
         var wordsForQuestion = unlearnedWords.shuffled().take(NUMBER_OF_QUESTION)
         if (wordsForQuestion.size < NUMBER_OF_QUESTION) {
-            val mutableWordsForQuestion = wordsForQuestion.toMutableList()
-            mutableWordsForQuestion += getLearnedWords(dictionary)
+            wordsForQuestion = wordsForQuestion + getLearnedWords(dictionary)
                 .shuffled()
                 .take(NUMBER_OF_QUESTION - wordsForQuestion.size)
-            wordsForQuestion = mutableWordsForQuestion
         }
 
         val studyWord = wordsForQuestion.random()
