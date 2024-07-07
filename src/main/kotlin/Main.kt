@@ -49,7 +49,7 @@ fun statistics(dictionary: List<Word>) {
 data class Word(
     val text: String,
     val translate: String,
-    val correctAnswerCount: Int = 0,
+    var correctAnswerCount: Int = 0,
 )
 
 fun learningWords(dictionary: List<Word>) {
@@ -61,13 +61,12 @@ fun learningWords(dictionary: List<Word>) {
         }
 
         var wordsForQuestion = unlearnedWords.shuffled().take(NUMBER_OF_QUESTION)
+        val studyWord = wordsForQuestion.random()
         if (wordsForQuestion.size < NUMBER_OF_QUESTION) {
             wordsForQuestion = wordsForQuestion + getLearnedWords(dictionary)
                 .shuffled()
                 .take(NUMBER_OF_QUESTION - wordsForQuestion.size)
         }
-
-        val studyWord = wordsForQuestion.random()
 
         println("Переведи слово: ${studyWord.text}")
         val question = wordsForQuestion.mapIndexed { index, word ->
@@ -76,10 +75,34 @@ fun learningWords(dictionary: List<Word>) {
         println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
 
         val answer = readln()
+        saveDictionary(wordsForQuestion, studyWord, answer, dictionary)
 
         if (answer == "0") {
             println("Главное меню")
             return
+        }
+    }
+}
+
+fun saveDictionary(
+    wordsForQuestion: List<Word>,
+    studyWord: Word,
+    answer: String,
+    dictionary: List<Word>,
+) {
+    val indexStudyWord = wordsForQuestion.indexOf(studyWord)
+    val indexAnswerWord = answer.toInt() - 1
+    if (indexStudyWord == indexAnswerWord) {
+        dictionary.map { word: Word ->
+            if (word.text == studyWord.text) {
+                word.correctAnswerCount += 1
+            }
+
+            File("words.txt").printWriter().use { out ->
+                dictionary.forEach { line ->
+                    out.println("${line.text.trim()} | ${line.translate.trim()} | ${line.correctAnswerCount}")
+                }
+            }
         }
     }
 }
