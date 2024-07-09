@@ -63,9 +63,9 @@ fun learningWords(dictionary: List<Word>) {
         var wordsForQuestion = unlearnedWords.shuffled().take(NUMBER_OF_QUESTION)
         val studyWord = wordsForQuestion.random()
         if (wordsForQuestion.size < NUMBER_OF_QUESTION) {
-            wordsForQuestion = wordsForQuestion + getLearnedWords(dictionary)
+            wordsForQuestion = (wordsForQuestion + getLearnedWords(dictionary)
                 .shuffled()
-                .take(NUMBER_OF_QUESTION - wordsForQuestion.size)
+                .take(NUMBER_OF_QUESTION - wordsForQuestion.size)).shuffled()
         }
 
         println("Переведи слово: ${studyWord.text}")
@@ -75,7 +75,15 @@ fun learningWords(dictionary: List<Word>) {
         println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
 
         val answer = readln()
-        saveDictionary(wordsForQuestion, studyWord, answer, dictionary)
+
+        val indexStudyWord = wordsForQuestion.indexOf(studyWord)
+        val indexAnswerWord = answer.toInt() - 1
+        if (indexStudyWord == indexAnswerWord) {
+            studyWord.correctAnswerCount += 1
+            saveDictionary(dictionary)
+        }
+
+        saveDictionary(dictionary)
 
         if (answer == "0") {
             println("Главное меню")
@@ -84,25 +92,10 @@ fun learningWords(dictionary: List<Word>) {
     }
 }
 
-fun saveDictionary(
-    wordsForQuestion: List<Word>,
-    studyWord: Word,
-    answer: String,
-    dictionary: List<Word>,
-) {
-    val indexStudyWord = wordsForQuestion.indexOf(studyWord)
-    val indexAnswerWord = answer.toInt() - 1
-    if (indexStudyWord == indexAnswerWord) {
-        dictionary.map { word: Word ->
-            if (word.text == studyWord.text) {
-                word.correctAnswerCount += 1
-            }
-
-            File("words.txt").printWriter().use { out ->
-                dictionary.forEach { line ->
-                    out.println("${line.text.trim()} | ${line.translate.trim()} | ${line.correctAnswerCount}")
-                }
-            }
+fun saveDictionary(dictionary: List<Word>) {
+    File("words.txt").printWriter().use { out ->
+        dictionary.forEach { line ->
+            out.println("${line.text.trim()} | ${line.translate.trim()} | ${line.correctAnswerCount}")
         }
     }
 }

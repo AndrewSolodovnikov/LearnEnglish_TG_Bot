@@ -8,5 +8,5 @@ learn | учить | 4
 computer | компьютер | 4
 change | замена | 4
 return | вернуть | 4
-shuffled | перетасованный | 4
-take | брать | 4
+shuffled | перетасованный | 0
+take | брать | 0
