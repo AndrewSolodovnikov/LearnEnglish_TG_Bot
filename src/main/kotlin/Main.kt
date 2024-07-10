@@ -68,26 +68,24 @@ fun learningWords(dictionary: List<Word>) {
                 .take(NUMBER_OF_QUESTION - wordsForQuestion.size)).shuffled()
         }
 
-        println("Переведи слово: ${studyWord.text}")
-        val question = wordsForQuestion.mapIndexed { index, word ->
-            "${index + 1} - ${word.translate.trim()}"
-        }
-        println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
+        while (true) {
+            getQuestion(studyWord, wordsForQuestion)
+            val answer = readln()
 
-        val answer = readln()
+            if (answer.isNotEmpty()) {
+                val indexStudyWord = wordsForQuestion.indexOf(studyWord)
+                val indexAnswerWord = answer?.toInt()?.minus(1)
+                if (indexStudyWord == indexAnswerWord) {
+                    studyWord.correctAnswerCount += 1
+                    saveDictionary(dictionary)
+                    break
+                }
+            }
 
-        val indexStudyWord = wordsForQuestion.indexOf(studyWord)
-        val indexAnswerWord = answer.toInt() - 1
-        if (indexStudyWord == indexAnswerWord) {
-            studyWord.correctAnswerCount += 1
-            saveDictionary(dictionary)
-        }
-
-        saveDictionary(dictionary)
-
-        if (answer == "0") {
-            println("Главное меню")
-            return
+            if (answer == "0") {
+                println("Главное меню")
+                return
+            }
         }
     }
 }
@@ -98,4 +96,12 @@ fun saveDictionary(dictionary: List<Word>) {
             out.println("${line.text.trim()} | ${line.translate.trim()} | ${line.correctAnswerCount}")
         }
     }
+}
+
+fun getQuestion(studyWord: Word, wordsForQuestion: List<Word>) {
+    println("Переведи слово: ${studyWord.text}")
+    val question = wordsForQuestion.mapIndexed { index, word ->
+        "${index + 1} - ${word.translate.trim()}"
+    }
+    println("Варианты: ${question.joinToString(", ")}, 0 - выйти в меню")
 }
