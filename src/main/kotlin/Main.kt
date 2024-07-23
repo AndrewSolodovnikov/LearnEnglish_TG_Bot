@@ -1,15 +1,15 @@
-const val TARGET_NUMBER_OF_WORDS_LEARNED = 3
-const val NUMBER_OF_QUESTION = 4
 fun main() {
-    val trainer = LearnWordsTrainer()
+    val dict = Dictionary()
+    val trainer = LearnWordsTrainer(dict.dictionary)
+    val loadStatistics = LoadStatistics(dict.dictionary)
 
     while (true) {
         println("Меню: 1 – Учить слова, 2 – Статистика, 0 – Выход")
 
         when (readln()) {
-            "1" -> trainer.learningWords(trainer.dictionary)
+            "1" -> trainer.learningWords(dict.dictionary)
             "2" -> {
-                val statistics = trainer.statistics(trainer.dictionary)
+                val statistics = loadStatistics.getStatistics(dict.dictionary)
                 println("Выучено ${statistics.countLearnedWords} из " +
                         "${statistics.countWords} | ${statistics.percentageWordsLearned}%")
             }
