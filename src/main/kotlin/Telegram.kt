@@ -22,7 +22,6 @@ fun main(args: Array<String>) {
 }
 
 fun getUpdates(botToken: String, updateId: Int): String {
-    val urlGetMy = "https://api.telegram.org/bot$botToken/getMe"
     val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates?offset=$updateId"
 
     val builder: HttpClient.Builder = HttpClient.newBuilder()
