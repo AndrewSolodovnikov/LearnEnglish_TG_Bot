@@ -1,0 +1,2 @@
+const val TARGET_NUMBER_OF_WORDS_LEARNED = 3
+const val NUMBER_OF_QUESTION = 4
